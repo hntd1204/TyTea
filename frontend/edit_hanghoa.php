@@ -16,10 +16,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $loaihang = $_POST['loaihang'];
     $giaban = $_POST['giaban'];
     $tonkho = $_POST['tonkho'];
+    $donvitinh = $_POST['donvitinh'];
     $nhacungcap = $_POST['nhacungcap'];
 
     $sql = "UPDATE hanghoa 
-            SET tenhang='$tenhang', loaihang='$loaihang', giaban='$giaban', tonkho='$tonkho', nhacungcap='$nhacungcap' 
+            SET tenhang='$tenhang', loaihang='$loaihang', giaban='$giaban', tonkho='$tonkho',
+                donvitinh='$donvitinh', nhacungcap='$nhacungcap'
             WHERE id=$id";
     $conn->query($sql);
     header("Location: hanghoa.php");
@@ -36,18 +38,19 @@ $row = $result->fetch_assoc();
     <form method="POST">
         <div class="form-group">
             <label>Mã hàng (không sửa)</label>
-            <input type="text" class="form-control" value="<?= $row['mahang'] ?>" disabled>
+            <input type="text" class="form-control" value="<?= htmlspecialchars($row['mahang']) ?>" disabled>
         </div>
         <div class="form-group">
             <label>Tên hàng</label>
-            <input type="text" name="tenhang" class="form-control" value="<?= $row['tenhang'] ?>" required>
+            <input type="text" name="tenhang" class="form-control" value="<?= htmlspecialchars($row['tenhang']) ?>"
+                required>
         </div>
         <div class="form-group">
             <label>Loại hàng</label>
-            <input type="text" name="loaihang" class="form-control" value="<?= $row['loaihang'] ?>">
+            <input type="text" name="loaihang" class="form-control" value="<?= htmlspecialchars($row['loaihang']) ?>">
         </div>
         <div class="form-group">
-            <label>Giá bán</label>
+            <label>Giá nhập</label>
             <input type="number" name="giaban" class="form-control" value="<?= $row['giaban'] ?>" required>
         </div>
         <div class="form-group">
@@ -55,8 +58,14 @@ $row = $result->fetch_assoc();
             <input type="number" name="tonkho" class="form-control" value="<?= $row['tonkho'] ?>" required>
         </div>
         <div class="form-group">
+            <label>Đơn vị tính</label>
+            <input type="text" name="donvitinh" class="form-control" value="<?= htmlspecialchars($row['donvitinh']) ?>"
+                required>
+        </div>
+        <div class="form-group">
             <label>Nhà cung cấp</label>
-            <input type="text" name="nhacungcap" class="form-control" value="<?= $row['nhacungcap'] ?>">
+            <input type="text" name="nhacungcap" class="form-control"
+                value="<?= htmlspecialchars($row['nhacungcap']) ?>">
         </div>
         <button type="submit" class="btn btn-primary">Cập nhật</button>
         <a href="hanghoa.php" class="btn btn-secondary">Hủy</a>

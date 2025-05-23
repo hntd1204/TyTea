@@ -10,10 +10,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahang'])) {
     $loaihang = $_POST['loaihang'];
     $giaban = $_POST['giaban'];
     $tonkho = $_POST['tonkho'];
+    $donvitinh = $_POST['donvitinh'];
     $nhacungcap = $_POST['nhacungcap'] ?? '';
 
-    $sql = "INSERT INTO hanghoa (mahang, tenhang, loaihang, giaban, tonkho, nhacungcap)
-            VALUES ('$mahang', '$tenhang', '$loaihang', '$giaban', '$tonkho', '$nhacungcap')";
+    $sql = "INSERT INTO hanghoa (mahang, tenhang, loaihang, giaban, tonkho, donvitinh, nhacungcap)
+            VALUES ('$mahang', '$tenhang', '$loaihang', '$giaban', '$tonkho', '$donvitinh', '$nhacungcap')";
     $conn->query($sql);
     header("Location: hanghoa.php");
     exit;
@@ -53,6 +54,8 @@ if (isset($_POST['nhap_id']) && isset($_POST['so_luong_nhap'])) {
             </div>
             <div class="col"><input type="number" name="tonkho" class="form-control" placeholder="Tồn kho" required>
             </div>
+            <div class="col"><input name="donvitinh" class="form-control" placeholder="Đơn vị (ví dụ: kg, gói)"
+                    required></div>
             <div class="col"><input name="nhacungcap" class="form-control" placeholder="Nhà cung cấp"></div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Thêm</button>
@@ -69,6 +72,7 @@ if (isset($_POST['nhap_id']) && isset($_POST['so_luong_nhap'])) {
                 <th>Loại</th>
                 <th>Giá nhập</th>
                 <th>Tồn kho</th>
+                <th>Đơn vị</th>
                 <th>Nhà cung cấp</th>
                 <th>Thao tác</th>
             </tr>
@@ -91,6 +95,7 @@ if (isset($_POST['nhap_id']) && isset($_POST['so_luong_nhap'])) {
                     <td>{$row['loaihang']}</td>
                     <td>" . number_format($row['giaban'], 0, ',', '.') . "đ</td>
                     <td>{$row['tonkho']}</td>
+                    <td>{$row['donvitinh']}</td>
                     <td>{$row['nhacungcap']}</td>
                     <td>
                         <a href='edit_hanghoa.php?id={$row['id']}' class='btn btn-sm btn-primary'>

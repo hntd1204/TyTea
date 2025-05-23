@@ -64,10 +64,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <td>{$row['tenmon']}</td>
                         <td>" . number_format($row['gia'], 0, ',', '.') . "đ</td>
                         <td>{$row['loai']}</td>
-                        <td>{$row['trangthai']}</td>
+                        <td>" . htmlspecialchars($row['trangthai']) . "</td>
                         <td>
-                            <a href='edit_mon.php?id={$row['id']}' class='btn btn-sm btn-primary'><i class='fas fa-edit'></i> Sửa</a>
-                            <a href='../backend/delete_mon.php?id={$row['id']}' class='btn btn-sm btn-danger' onclick='return confirm(\"Xác nhận xóa?\");'><i class='fas fa-trash-alt'></i> Xóa</a>
+                            <a href='edit_mon.php?id={$row['id']}' class='btn btn-sm btn-primary'>
+                                <i class='fas fa-edit'></i> Sửa
+                            </a>
+                            <a href='../backend/delete_mon.php?id={$row['id']}' class='btn btn-sm btn-danger'
+                               onclick='return confirm(\"Xác nhận xóa?\");'>
+                               <i class='fas fa-trash-alt'></i> Xóa
+                            </a>
                         </td>
                     </tr>";
             }

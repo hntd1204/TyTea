@@ -3,18 +3,18 @@ include('layout/header.php');
 include('layout/sidebar.php');
 include('../backend/db_connect.php');
 
-$id = $_GET['id'] ?? 0;
-if (!$id) {
+$id = (int)($_GET['id'] ?? 0);
+if ($id <= 0) {
     header("Location: menu.php");
     exit;
 }
 
 // Xử lý cập nhật
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $tenmon = $_POST['tenmon'];
-    $gia = $_POST['gia'];
-    $loai = $_POST['loai'];
-    $trangthai = $_POST['trangthai'];
+    $tenmon = $conn->real_escape_string($_POST['tenmon']);
+    $gia = (int)$_POST['gia'];
+    $loai = $conn->real_escape_string($_POST['loai']);
+    $trangthai = $conn->real_escape_string($_POST['trangthai']);
 
     $conn->query("UPDATE menu SET tenmon='$tenmon', gia=$gia, loai='$loai', trangthai='$trangthai' WHERE id=$id");
     header("Location: menu.php");
@@ -24,19 +24,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Lấy dữ liệu món cần sửa
 $result = $conn->query("SELECT * FROM menu WHERE id = $id");
 $row = $result->fetch_assoc();
+
+if (!$row) {
+    echo "<div class='p-4'>Món không tồn tại.</div>";
+    include('layout/footer.php');
+    exit;
+}
 ?>
 
 <div id="page-content-wrapper" class="p-4">
-    <h2 class="mb-4">Sửa món: <?= $row['tenmon'] ?></h2>
+    <h2 class="mb-4">Sửa món: <?= htmlspecialchars($row['tenmon']) ?></h2>
 
     <form method="POST">
         <div class="form-group">
             <label>Mã món (không thay đổi)</label>
-            <input type="text" class="form-control" value="<?= $row['mamon'] ?>" disabled>
+            <input type="text" class="form-control" value="<?= htmlspecialchars($row['mamon']) ?>" disabled>
         </div>
         <div class="form-group">
             <label>Tên món</label>
-            <input type="text" name="tenmon" class="form-control" value="<?= $row['tenmon'] ?>" required>
+            <input type="text" name="tenmon" class="form-control" value="<?= htmlspecialchars($row['tenmon']) ?>"
+                required>
         </div>
         <div class="form-group">
             <label>Giá</label>
@@ -44,7 +51,7 @@ $row = $result->fetch_assoc();
         </div>
         <div class="form-group">
             <label>Loại món</label>
-            <input type="text" name="loai" class="form-control" value="<?= $row['loai'] ?>" required>
+            <input type="text" name="loai" class="form-control" value="<?= htmlspecialchars($row['loai']) ?>" required>
         </div>
         <div class="form-group">
             <label>Trạng thái</label>

@@ -10,8 +10,22 @@ include('layout/sidebar.php');
 
 <!-- Nội dung chính -->
 <div id="page-content-wrapper" class="p-4">
-    <h2>Chào mừng đến với hệ thống quản lý bán hàng</h2>
-    <p>Vui lòng chọn chức năng từ menu bên trái để bắt đầu sử dụng.</p>
+    <div class="card shadow-sm border-0 rounded-lg p-4 bg-white" style="max-width: 700px; margin: auto;">
+        <div class="text-center mb-3">
+            <img src="../img/powder.png" alt="Matcha Tea" width="80">
+        </div>
+        <h2 class="text-center text-success font-weight-bold">Chào mừng đến với hệ thống</h2>
+        <h4 class="text-center text-primary mb-3">TyTea - Matcha and Tea 🍵</h4>
+        <p class="text-center text-muted">
+            Hệ thống quản lý bán hàng giúp bạn kiểm soát món, đơn hàng, doanh thu, và nhà cung cấp nhanh chóng và dễ
+            dàng.
+        </p>
+        <div class="text-center mt-4">
+            <a href="hanghoa.php" class="btn btn-outline-success btn-lg px-4">
+                <i class="fas fa-box mr-2"></i> Quản lý hàng hóa
+            </a>
+        </div>
+    </div>
 </div>
 
 <?php include('layout/footer.php'); ?>
