@@ -1,7 +1,8 @@
 <?php
+$conn->set_charset("utf8mb4");
 $host = 'localhost';
 $user = 'root';
-$pass = ''; // hoặc '123456' tùy cấu hình máy
+$pass = '';
 $dbname = 'qlbh';
 
 $conn = new mysqli($host, $user, $pass, $dbname);
