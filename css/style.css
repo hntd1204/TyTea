@@ -1,0 +1,31 @@
+#wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+#sidebar-wrapper {
+    width: 250px;
+    min-height: 100vh;
+    background-color: #007bff;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+#page-content-wrapper {
+    margin-left: 250px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    width: 100%;
+}
+
+.list-group-item {
+    border: none;
+    font-weight: 500;
+}
+
+.list-group-item:hover {
+    background-color: #0056b3;
+    color: white;
+}
