@@ -1,133 +1,155 @@
 <?php include('layout/header.php'); ?>
 <?php include('layout/sidebar.php'); ?>
 <?php include('../backend/db_connect.php'); ?>
-
 <?php
-// Xử lý thêm hàng hóa mới
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Xử lý thêm hàng hóa
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahang'])) {
     $mahang = $_POST['mahang'];
     $tenhang = $_POST['tenhang'];
+    $giavon = $_POST['giavon'];
     $loaihang = $_POST['loaihang'];
-    $giaban = $_POST['giaban'];
-    $tonkho = $_POST['tonkho'];
+    $nhomhang = $_POST['nhomhang'];
+    $soluong = $_POST['soluong'];
     $donvitinh = $_POST['donvitinh'];
-    $nhacungcap = $_POST['nhacungcap'] ?? '';
+    $tonkho = $_POST['tonkho'];
+    $nhacungcap = $_POST['nhacungcap'];
 
-    $sql = "INSERT INTO hanghoa (mahang, tenhang, loaihang, giaban, tonkho, donvitinh, nhacungcap)
-            VALUES ('$mahang', '$tenhang', '$loaihang', '$giaban', '$tonkho', '$donvitinh', '$nhacungcap')";
+    $sql = "INSERT INTO hanghoa 
+        (mahang, tenhang, giavon, loaihang, nhomhang, soluong, donvitinh, tonkho, nhacungcap)
+        VALUES 
+        ('$mahang', '$tenhang', '$giavon', '$loaihang', '$nhomhang', '$soluong', '$donvitinh', '$tonkho', '$nhacungcap')";
     $conn->query($sql);
     header("Location: hanghoa.php");
     exit;
 }
+$search = $_GET['search'] ?? '';
+$cond = '';
 
-// Xử lý nhập thêm tồn kho
-if (isset($_POST['nhap_id']) && isset($_POST['so_luong_nhap'])) {
-    $id = (int) $_POST['nhap_id'];
-    $sl = (int) $_POST['so_luong_nhap'];
-    if ($sl > 0) {
-        $conn->query("UPDATE hanghoa SET tonkho = tonkho + $sl WHERE id = $id");
-    }
-    header("Location: hanghoa.php");
-    exit;
+if (!empty($search)) {
+    $s = $conn->real_escape_string($search);
+    $cond = "WHERE mahang LIKE '%$s%' OR tenhang LIKE '%$s%' OR nhacungcap LIKE '%$s%'";
 }
+
+$result = $conn->query("SELECT * FROM hanghoa $cond ORDER BY id DESC");
+
+
+// Lấy dữ liệu danh sách
+$result = $conn->query("SELECT * FROM hanghoa ORDER BY id DESC");
+$ds_loai = $conn->query("SELECT ten FROM loaihang ORDER BY ten ASC");
+$ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
 ?>
 
 <div id="page-content-wrapper" class="p-4">
-    <h2 class="mb-4">Danh sách hàng hóa</h2>
+    <div class="d-flex justify-content-between mb-4 align-items-center">
+        <h2>Danh sách hàng hóa</h2>
+        <button class="btn btn-success" data-toggle="modal" data-target="#themModal">
+            <i class="fas fa-plus"></i> Thêm mới
+        </button>
+    </div>
+    <!-- Form tìm kiếm -->
+    <form method="GET" class="form-inline mb-3">
+        <input type="text" name="search" class="form-control mr-2" placeholder="Tìm theo mã, tên hoặc nhà cung cấp..."
+            value="<?= htmlspecialchars($search) ?>">
+        <button class="btn btn-outline-primary"><i class="fas fa-search"></i> Tìm</button>
+    </form>
 
-    <!-- Tìm kiếm -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <form method="GET" class="form-inline">
-            <input type="text" name="search" class="form-control mr-2" placeholder="Tìm theo mã hoặc tên..."
-                value="<?= $_GET['search'] ?? '' ?>">
-            <button type="submit" class="btn btn-outline-primary">Tìm</button>
-        </form>
+    <!-- Modal Thêm -->
+    <div class="modal fade" id="themModal" tabindex="-1" role="dialog" aria-labelledby="themModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <form method="POST" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm hàng hóa</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row mb-2">
+                        <div class="col"><label>Mã hàng hóa</label><input name="mahang" class="form-control" required>
+                        </div>
+                        <div class="col"><label>Tên hàng hóa</label><input name="tenhang" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="col"><label>Giá nhập</label><input name="giavon" type="number" class="form-control"
+                                required></div>
+                        <div class="col"><label>Loại hàng</label>
+                            <select name="loaihang" class="form-control">
+                                <?php while ($l = $ds_loai->fetch_assoc()) echo "<option value='{$l['ten']}'>{$l['ten']}</option>"; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="col"><label>Nhóm hàng</label>
+                            <select name="nhomhang" class="form-control">
+                                <?php while ($n = $ds_nhom->fetch_assoc()) echo "<option value='{$n['ten']}'>{$n['ten']}</option>"; ?>
+                            </select>
+                        </div>
+                        <div class="col"><label>Số lượng</label><input name="soluong" type="number" class="form-control"
+                                value="1"></div>
+                        <div class="col"><label>Đơn vị tính</label><input name="donvitinh" class="form-control"
+                                placeholder="kg, gam, ml..."></div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="col"><label>Tồn kho</label><input name="tonkho" type="number" class="form-control"
+                                required></div>
+                        <div class="col"><label>Nhà cung cấp</label><input name="nhacungcap" class="form-control"
+                                placeholder="Nhập tên hoặc link"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Form thêm hàng mới -->
-    <form method="POST" class="mb-4">
-        <div class="form-row">
-            <div class="col"><input name="mahang" class="form-control" placeholder="Mã hàng" required></div>
-            <div class="col"><input name="tenhang" class="form-control" placeholder="Tên hàng" required></div>
-            <div class="col"><input name="loaihang" class="form-control" placeholder="Loại hàng"></div>
-            <div class="col"><input type="number" name="giaban" class="form-control" placeholder="Giá nhập" required>
-            </div>
-            <div class="col"><input type="number" name="tonkho" class="form-control" placeholder="Tồn kho" required>
-            </div>
-            <div class="col"><input name="donvitinh" class="form-control" placeholder="Đơn vị (ví dụ: kg, gói)"
-                    required></div>
-            <div class="col"><input name="nhacungcap" class="form-control" placeholder="Nhà cung cấp"></div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Thêm</button>
-            </div>
-        </div>
-    </form>
-
-    <!-- Bảng danh sách hàng hóa -->
-    <table class="table table-bordered table-hover">
-        <thead class="thead-light">
-            <tr>
-                <th>Mã hàng</th>
-                <th>Tên hàng</th>
-                <th>Loại</th>
-                <th>Giá nhập</th>
-                <th>Tồn kho</th>
-                <th>Đơn vị</th>
-                <th>Nhà cung cấp</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $search = $_GET['search'] ?? '';
-            $search_sql = "";
-
-            if (!empty($search)) {
-                $search = $conn->real_escape_string($search);
-                $search_sql = "WHERE mahang LIKE '%$search%' OR tenhang LIKE '%$search%'";
-            }
-
-            $result = $conn->query("SELECT * FROM hanghoa $search_sql ORDER BY id DESC");
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr>
-                    <td>{$row['mahang']}</td>
-                    <td>{$row['tenhang']}</td>
-                    <td>{$row['loaihang']}</td>
-                    <td>" . number_format($row['giaban'], 0, ',', '.') . "đ</td>
-                    <td>{$row['tonkho']}</td>
-                    <td>{$row['donvitinh']}</td>
-                    <td>{$row['nhacungcap']}</td>
-                    <td>
-                        <a href='edit_hanghoa.php?id={$row['id']}' class='btn btn-sm btn-primary'>
-                            <i class='fas fa-edit'></i> Sửa
-                        </a>
-                        <a href='../backend/delete_hanghoa.php?id={$row['id']}' class='btn btn-sm btn-danger'
-                           onclick='return confirm(\"Xác nhận xóa?\");'>
-                           <i class='fas fa-trash-alt'></i> Xóa
-                        </a>
-                    </td>
-                </tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-
-    <!-- Nhập thêm hàng -->
-    <h4 class="mt-5 mb-3">Nhập thêm hàng vào kho</h4>
-    <form method="POST" class="form-inline">
-        <select name="nhap_id" class="form-control mr-2" required>
-            <option value="">-- Chọn hàng --</option>
-            <?php
-            $list = $conn->query("SELECT id, tenhang, mahang FROM hanghoa");
-            while ($item = $list->fetch_assoc()) {
-                echo "<option value='{$item['id']}'>{$item['tenhang']} ({$item['mahang']})</option>";
-            }
-            ?>
-        </select>
-        <input type="number" name="so_luong_nhap" class="form-control mr-2" placeholder="Số lượng nhập" min="1"
-            required>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Nhập hàng</button>
-    </form>
+    <!-- Bảng dữ liệu -->
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Mã hàng</th>
+                    <th>Tên hàng</th>
+                    <th>Giá nhập</th>
+                    <th>Loại hàng</th>
+                    <th>Nhóm hàng</th>
+                    <th>Số lượng</th>
+                    <th>Đơn vị</th>
+                    <th>Tồn kho</th>
+                    <th>Nhà cung cấp</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['mahang']) ?></td>
+                        <td><?= htmlspecialchars($row['tenhang']) ?></td>
+                        <td><?= number_format($row['giavon'], 0, ',', '.') ?>đ</td>
+                        <td><?= htmlspecialchars($row['loaihang']) ?></td>
+                        <td><?= htmlspecialchars($row['nhomhang']) ?></td>
+                        <td><?= $row['soluong'] ?></td>
+                        <td><?= htmlspecialchars($row['donvitinh']) ?></td>
+                        <td><?= $row['tonkho'] ?></td>
+                        <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
+                        <td>
+                            <a href="edit_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
+                            <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Xác nhận xóa?')">Xóa</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<!-- Bootstrap & jQuery nếu chưa có -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <?php include('layout/footer.php'); ?>

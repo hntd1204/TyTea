@@ -9,17 +9,14 @@
         <a href="hanghoa.php" class="list-group-item list-group-item-action bg-primary text-white">
             <i class="fas fa-box mr-2"></i> Hàng hóa
         </a>
-        <a href="menu.php" class="list-group-item list-group-item-action bg-primary text-white">
-            <i class="fas fa-utensils mr-2"></i> Món / Menu
+        <a href="nhomhang.php" class="list-group-item list-group-item-action bg-primary text-white">
+            <i class="fas fa-layer-group mr-2"></i> Nhóm hàng
         </a>
-        <a href="hoadon.php" class="list-group-item list-group-item-action bg-primary text-white">
-            <i class="fas fa-file-invoice mr-2"></i> Hóa đơn
+        <a href="loaihang.php" class="list-group-item list-group-item-action bg-primary text-white">
+            <i class="fas fa-tags mr-2"></i> Loại hàng
         </a>
-        <a href="doanhthu.php" class="list-group-item list-group-item-action bg-primary text-white">
-            <i class="fas fa-chart-line mr-2"></i> Doanh thu
-        </a>
-        <a href="khachhang.php" class="list-group-item list-group-item-action bg-primary text-white">
-            <i class="fas fa-user-friends mr-2"></i> Khách hàng
+        <a href="loaithucdon.php" class="list-group-item list-group-item-action bg-primary text-white">
+            <i class="fas fa-list-alt mr-2"></i> Loại thực đơn
         </a>
         <a href="nhacungcap.php" class="list-group-item list-group-item-action bg-primary text-white">
             <i class="fas fa-truck mr-2"></i> Nhà cung cấp

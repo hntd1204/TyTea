@@ -1,8 +1,8 @@
-<?php
-include('layout/header.php');
-include('layout/sidebar.php');
-include('../backend/db_connect.php');
+<?php include('layout/header.php'); ?>
+<?php include('layout/sidebar.php'); ?>
+<?php include('../backend/db_connect.php'); ?>
 
+<?php
 $ncc = $_GET['ncc'] ?? '';
 if (!$ncc) {
     header("Location: nhacungcap.php");
@@ -10,12 +10,11 @@ if (!$ncc) {
 }
 
 $ncc_sql = $conn->real_escape_string($ncc);
-$hangs = $conn->query("SELECT * FROM hanghoa WHERE nhacungcap = '$ncc_sql'");
+$products = $conn->query("SELECT * FROM hanghoa WHERE nhacungcap = '$ncc_sql'");
 ?>
 
 <div id="page-content-wrapper" class="p-4">
-    <h2 class="mb-4">Danh sách hàng của nhà cung cấp: <strong><?= htmlspecialchars($ncc) ?></strong></h2>
-
+    <h2 class="mb-4">Sản phẩm từ nhà cung cấp: <strong><?= htmlspecialchars($ncc) ?></strong></h2>
     <a href="nhacungcap.php" class="btn btn-secondary mb-3">← Quay lại</a>
 
     <table class="table table-bordered table-hover">
@@ -23,20 +22,24 @@ $hangs = $conn->query("SELECT * FROM hanghoa WHERE nhacungcap = '$ncc_sql'");
             <tr>
                 <th>Mã hàng</th>
                 <th>Tên hàng</th>
-                <th>Loại</th>
+                <th>Loại hàng</th>
                 <th>Giá nhập</th>
+                <th>Số lượng</th>
+                <th>Đơn vị</th>
                 <th>Tồn kho</th>
             </tr>
         </thead>
         <tbody>
-            <?php while ($row = $hangs->fetch_assoc()): ?>
-            <tr>
-                <td><?= $row['mahang'] ?></td>
-                <td><?= $row['tenhang'] ?></td>
-                <td><?= $row['loaihang'] ?></td>
-                <td><?= number_format($row['giaban'], 0, ',', '.') ?>đ</td>
-                <td><?= $row['tonkho'] ?></td>
-            </tr>
+            <?php while ($hh = $products->fetch_assoc()): ?>
+                <tr>
+                    <td><?= htmlspecialchars($hh['mahang']) ?></td>
+                    <td><?= htmlspecialchars($hh['tenhang']) ?></td>
+                    <td><?= htmlspecialchars($hh['loaihang']) ?></td>
+                    <td><?= number_format($hh['giavon'], 0, ',', '.') ?>đ</td>
+                    <td><?= $hh['soluong'] ?></td>
+                    <td><?= htmlspecialchars($hh['donvitinh']) ?></td>
+                    <td><?= $hh['tonkho'] ?></td>
+                </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
