@@ -25,19 +25,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahang'])) {
     header("Location: hanghoa.php");
     exit;
 }
+
+// Xử lý điều kiện lọc
 $search = $_GET['search'] ?? '';
-$cond = '';
+$filter_nhom = $_GET['filter_nhom'] ?? '';
+$filter_loai = $_GET['filter_loai'] ?? '';
+$cond = [];
 
 if (!empty($search)) {
     $s = $conn->real_escape_string($search);
-    $cond = "WHERE mahang LIKE '%$s%' OR tenhang LIKE '%$s%' OR nhacungcap LIKE '%$s%'";
+    $cond[] = "(mahang LIKE '%$s%' OR tenhang LIKE '%$s%' OR nhacungcap LIKE '%$s%')";
 }
+if (!empty($filter_nhom)) {
+    $f = $conn->real_escape_string($filter_nhom);
+    $cond[] = "nhomhang = '$f'";
+}
+if (!empty($filter_loai)) {
+    $l = $conn->real_escape_string($filter_loai);
+    $cond[] = "loaihang = '$l'";
+}
+$where = count($cond) ? "WHERE " . implode(" AND ", $cond) : "";
 
-$result = $conn->query("SELECT * FROM hanghoa $cond ORDER BY id DESC");
+// Truy vấn chính
+$result = $conn->query("SELECT * FROM hanghoa $where ORDER BY id DESC");
 
-
-// Lấy dữ liệu danh sách
-$result = $conn->query("SELECT * FROM hanghoa ORDER BY id DESC");
+// Danh sách dropdown
 $ds_loai = $conn->query("SELECT ten FROM loaihang ORDER BY ten ASC");
 $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
 ?>
@@ -49,11 +61,35 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
             <i class="fas fa-plus"></i> Thêm mới
         </button>
     </div>
-    <!-- Form tìm kiếm -->
+
+    <!-- Form tìm kiếm & lọc -->
     <form method="GET" class="form-inline mb-3">
         <input type="text" name="search" class="form-control mr-2" placeholder="Tìm theo mã, tên hoặc nhà cung cấp..."
             value="<?= htmlspecialchars($search) ?>">
-        <button class="btn btn-outline-primary"><i class="fas fa-search"></i> Tìm</button>
+
+        <select name="filter_nhom" class="form-control mr-2">
+            <option value="">-- Nhóm hàng --</option>
+            <?php
+            $ds_nhom_filter = $conn->query("SELECT DISTINCT nhomhang FROM hanghoa ORDER BY nhomhang ASC");
+            while ($nh = $ds_nhom_filter->fetch_assoc()) {
+                $selected = ($filter_nhom == $nh['nhomhang']) ? 'selected' : '';
+                echo "<option value='{$nh['nhomhang']}' $selected>{$nh['nhomhang']}</option>";
+            }
+            ?>
+        </select>
+
+        <select name="filter_loai" class="form-control mr-2">
+            <option value="">-- Loại hàng --</option>
+            <?php
+            $ds_loai_filter = $conn->query("SELECT DISTINCT loaihang FROM hanghoa ORDER BY loaihang ASC");
+            while ($lh = $ds_loai_filter->fetch_assoc()) {
+                $selected = ($filter_loai == $lh['loaihang']) ? 'selected' : '';
+                echo "<option value='{$lh['loaihang']}' $selected>{$lh['loaihang']}</option>";
+            }
+            ?>
+        </select>
+
+        <button class="btn btn-outline-primary"><i class="fas fa-search"></i> Lọc</button>
     </form>
 
     <!-- Modal Thêm -->
@@ -96,7 +132,7 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
                         <div class="col"><label>Tồn kho</label><input name="tonkho" type="number" class="form-control"
                                 required></div>
                         <div class="col"><label>Nhà cung cấp</label><input name="nhacungcap" class="form-control"
-                                placeholder="Nhập tên hoặc link"></div>
+                                placeholder="Tên hoặc link"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -125,25 +161,35 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
                 </tr>
             </thead>
             <tbody>
-                <?php while ($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['mahang']) ?></td>
-                        <td><?= htmlspecialchars($row['tenhang']) ?></td>
-                        <td><?= number_format($row['giavon'], 0, ',', '.') ?>đ</td>
-                        <td><?= htmlspecialchars($row['loaihang']) ?></td>
-                        <td><?= htmlspecialchars($row['nhomhang']) ?></td>
-                        <td><?= $row['soluong'] ?></td>
-                        <td><?= htmlspecialchars($row['donvitinh']) ?></td>
-                        <td><?= $row['tonkho'] ?></td>
-                        <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
-                        <td>
-                            <a href="edit_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
-                            <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Xác nhận xóa?')">Xóa</a>
-                        </td>
-                    </tr>
+                <?php
+                $tongtien = 0;
+                while ($row = $result->fetch_assoc()):
+                    $tongtien += $row['giavon'] * $row['soluong'];
+                ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['mahang']) ?></td>
+                    <td><?= htmlspecialchars($row['tenhang']) ?></td>
+                    <td><?= number_format($row['giavon'], 0, ',', '.') ?>đ</td>
+                    <td><?= htmlspecialchars($row['loaihang']) ?></td>
+                    <td><?= htmlspecialchars($row['nhomhang']) ?></td>
+                    <td><?= $row['soluong'] ?></td>
+                    <td><?= htmlspecialchars($row['donvitinh']) ?></td>
+                    <td><?= $row['tonkho'] ?></td>
+                    <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
+                    <td>
+                        <a href="edit_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
+                        <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Xác nhận xóa?')">Xóa</a>
+                    </td>
+                </tr>
                 <?php endwhile; ?>
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="9" class="text-right font-weight-bold">Tổng tiền nhập:</td>
+                    <td class="text-danger font-weight-bold"><?= number_format($tongtien, 0, ',', '.') ?> đ</td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>
@@ -151,5 +197,4 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
 <!-- Bootstrap & jQuery nếu chưa có -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <?php include('layout/footer.php'); ?>
