@@ -1,4 +1,3 @@
-<meta charset="UTF-8">
 <div class="bg-primary border-right shadow" id="sidebar-wrapper">
     <div class="sidebar-heading text-white font-weight-bold text-center py-4" style="font-size: 1.2rem;">
         🍵 TyTea - Matcha and Tea
