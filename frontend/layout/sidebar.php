@@ -1,3 +1,4 @@
+<meta charset="UTF-8">
 <div class="bg-primary border-right shadow" id="sidebar-wrapper">
     <div class="sidebar-heading text-white font-weight-bold text-center py-4" style="font-size: 1.2rem;">
         🍵 TyTea - Matcha and Tea
@@ -21,6 +22,15 @@
         <a href="nhacungcap.php" class="list-group-item list-group-item-action bg-primary text-white">
             <i class="fas fa-truck mr-2"></i> Nhà cung cấp
         </a>
+
+        <!-- ✅ Quản lý hóa đơn ảnh -->
+        <a href="upload_hoadon.php" class="list-group-item list-group-item-action bg-primary text-white">
+            <i class="fas fa-upload mr-2"></i> Tải lên hóa đơn
+        </a>
+        <a href="danhsach_hoadon.php" class="list-group-item list-group-item-action bg-primary text-white">
+            <i class="fas fa-image mr-2"></i> Hóa đơn đã lưu
+        </a>
+
         <a href="logout.php" class="list-group-item list-group-item-action bg-primary text-white">
             <i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất
         </a>
