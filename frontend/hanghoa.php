@@ -5,7 +5,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Xử lý thêm hàng hóa
+// Thêm hàng hóa
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahang'])) {
     $mahang = $_POST['mahang'];
     $tenhang = $_POST['tenhang'];
@@ -16,17 +16,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahang'])) {
     $donvitinh = $_POST['donvitinh'];
     $tonkho = $_POST['tonkho'];
     $nhacungcap = $_POST['nhacungcap'];
+    $ghichu = $_POST['ghichu'];
 
     $sql = "INSERT INTO hanghoa 
-        (mahang, tenhang, giavon, loaihang, nhomhang, soluong, donvitinh, tonkho, nhacungcap)
+        (mahang, tenhang, giavon, loaihang, nhomhang, soluong, donvitinh, tonkho, nhacungcap, ghichu)
         VALUES 
-        ('$mahang', '$tenhang', '$giavon', '$loaihang', '$nhomhang', '$soluong', '$donvitinh', '$tonkho', '$nhacungcap')";
+        ('$mahang', '$tenhang', '$giavon', '$loaihang', '$nhomhang', '$soluong', '$donvitinh', '$tonkho', '$nhacungcap', '$ghichu')";
     $conn->query($sql);
     header("Location: hanghoa.php");
     exit;
 }
 
-// Xử lý điều kiện lọc
+// Lọc
 $search = $_GET['search'] ?? '';
 $filter_nhom = $_GET['filter_nhom'] ?? '';
 $filter_loai = $_GET['filter_loai'] ?? '';
@@ -46,10 +47,7 @@ if (!empty($filter_loai)) {
 }
 $where = count($cond) ? "WHERE " . implode(" AND ", $cond) : "";
 
-// Truy vấn chính
 $result = $conn->query("SELECT * FROM hanghoa $where ORDER BY id DESC");
-
-// Danh sách dropdown
 $ds_loai = $conn->query("SELECT ten FROM loaihang ORDER BY ten ASC");
 $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
 ?>
@@ -62,7 +60,6 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
         </button>
     </div>
 
-    <!-- Form tìm kiếm & lọc -->
     <form method="GET" class="form-inline mb-3">
         <input type="text" name="search" class="form-control mr-2" placeholder="Tìm theo mã, tên hoặc nhà cung cấp..."
             value="<?= htmlspecialchars($search) ?>">
@@ -93,8 +90,7 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
     </form>
 
     <!-- Modal Thêm -->
-    <div class="modal fade" id="themModal" tabindex="-1" role="dialog" aria-labelledby="themModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="themModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <form method="POST" class="modal-content">
                 <div class="modal-header">
@@ -133,6 +129,8 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
                                 required></div>
                         <div class="col"><label>Nhà cung cấp</label><input name="nhacungcap" class="form-control"
                                 placeholder="Tên hoặc link"></div>
+                        <div class="col"><label>Ghi chú</label><input name="ghichu" class="form-control"
+                                placeholder="Ghi chú / link..."></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -157,6 +155,7 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
                     <th>Đơn vị</th>
                     <th>Tồn kho</th>
                     <th>Nhà cung cấp</th>
+                    <th>Ghi chú</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -176,6 +175,7 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
                     <td><?= htmlspecialchars($row['donvitinh']) ?></td>
                     <td><?= $row['tonkho'] ?></td>
                     <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
+                    <td><?= htmlspecialchars($row['ghichu'] ?? '') ?></td>
                     <td>
                         <a href="edit_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
                         <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
@@ -186,7 +186,7 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="9" class="text-right font-weight-bold">Tổng tiền nhập:</td>
+                    <td colspan="10" class="text-right font-weight-bold">Tổng tiền nhập:</td>
                     <td class="text-danger font-weight-bold"><?= number_format($tongtien, 0, ',', '.') ?> đ</td>
                 </tr>
             </tfoot>
@@ -194,7 +194,6 @@ $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
     </div>
 </div>
 
-<!-- Bootstrap & jQuery nếu chưa có -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <?php include('layout/footer.php'); ?>

@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $donvitinh = $_POST['donvitinh'];
     $tonkho = $_POST['tonkho'];
     $nhacungcap = $_POST['nhacungcap'];
+    $ghichu = $_POST['ghichu'];
 
     $sql = "UPDATE hanghoa SET 
                 mahang='$mahang',
@@ -34,14 +35,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 soluong='$soluong',
                 donvitinh='$donvitinh',
                 tonkho='$tonkho',
-                nhacungcap='$nhacungcap'
+                nhacungcap='$nhacungcap',
+                ghichu='$ghichu'
             WHERE id=$id";
     $conn->query($sql);
     header("Location: hanghoa.php");
     exit;
 }
 
-// Lấy dữ liệu hiện tại của hàng hóa
+// Lấy dữ liệu hiện tại
 $row = $conn->query("SELECT * FROM hanghoa WHERE id = $id")->fetch_assoc();
 ?>
 
@@ -56,28 +58,30 @@ $row = $conn->query("SELECT * FROM hanghoa WHERE id = $id")->fetch_assoc();
                     <div class="col">
                         <label>Mã hàng hóa</label>
                         <input type="text" name="mahang" class="form-control"
-                            value="<?= htmlspecialchars($row['mahang']) ?>" required>
+                            value="<?= htmlspecialchars($row['mahang'] ?? '') ?>" required>
                     </div>
                     <div class="col">
                         <label>Tên hàng hóa</label>
                         <input type="text" name="tenhang" class="form-control"
-                            value="<?= htmlspecialchars($row['tenhang']) ?>" required>
+                            value="<?= htmlspecialchars($row['tenhang'] ?? '') ?>" required>
                     </div>
                 </div>
 
                 <div class="form-row mb-2">
                     <div class="col">
                         <label>Giá nhập</label>
-                        <input type="number" name="giavon" class="form-control" value="<?= $row['giavon'] ?>" required>
+                        <input type="number" name="giavon" class="form-control" value="<?= $row['giavon'] ?? 0 ?>"
+                            required>
                     </div>
                     <div class="col">
                         <label>Loại hàng</label>
                         <select name="loaihang" class="form-control">
                             <?php $ds_loai->data_seek(0);
                             while ($l = $ds_loai->fetch_assoc()): ?>
-                                <option value="<?= $l['ten'] ?>" <?= $l['ten'] == $row['loaihang'] ? 'selected' : '' ?>>
-                                    <?= $l['ten'] ?>
-                                </option>
+                            <option value="<?= $l['ten'] ?>"
+                                <?= ($l['ten'] == ($row['loaihang'] ?? '')) ? 'selected' : '' ?>>
+                                <?= $l['ten'] ?>
+                            </option>
                             <?php endwhile; ?>
                         </select>
                     </div>
@@ -89,32 +93,42 @@ $row = $conn->query("SELECT * FROM hanghoa WHERE id = $id")->fetch_assoc();
                         <select name="nhomhang" class="form-control">
                             <?php $ds_nhom->data_seek(0);
                             while ($n = $ds_nhom->fetch_assoc()): ?>
-                                <option value="<?= $n['ten'] ?>" <?= $n['ten'] == $row['nhomhang'] ? 'selected' : '' ?>>
-                                    <?= $n['ten'] ?>
-                                </option>
+                            <option value="<?= $n['ten'] ?>"
+                                <?= ($n['ten'] == ($row['nhomhang'] ?? '')) ? 'selected' : '' ?>>
+                                <?= $n['ten'] ?>
+                            </option>
                             <?php endwhile; ?>
                         </select>
                     </div>
                     <div class="col">
                         <label>Số lượng</label>
-                        <input type="number" name="soluong" class="form-control" value="<?= $row['soluong'] ?>">
+                        <input type="number" name="soluong" class="form-control" value="<?= $row['soluong'] ?? 0 ?>">
                     </div>
                     <div class="col">
                         <label>Đơn vị tính</label>
                         <input type="text" name="donvitinh" class="form-control"
-                            value="<?= htmlspecialchars($row['donvitinh']) ?>">
+                            value="<?= htmlspecialchars($row['donvitinh'] ?? '') ?>">
                     </div>
                 </div>
 
                 <div class="form-row mb-2">
                     <div class="col">
                         <label>Tồn kho</label>
-                        <input type="number" name="tonkho" class="form-control" value="<?= $row['tonkho'] ?>" required>
+                        <input type="number" name="tonkho" class="form-control" value="<?= $row['tonkho'] ?? 0 ?>"
+                            required>
                     </div>
                     <div class="col">
                         <label>Nhà cung cấp</label>
                         <input type="text" name="nhacungcap" class="form-control"
-                            value="<?= htmlspecialchars($row['nhacungcap']) ?>" placeholder="Tên hoặc link NCC">
+                            value="<?= htmlspecialchars($row['nhacungcap'] ?? '') ?>" placeholder="Tên hoặc link NCC">
+                    </div>
+                </div>
+
+                <div class="form-row mb-2">
+                    <div class="col">
+                        <label>Ghi chú</label>
+                        <textarea name="ghichu" class="form-control" rows="2"
+                            placeholder="Ghi chú thêm (link, mô tả...)"><?= htmlspecialchars($row['ghichu'] ?? '') ?></textarea>
                     </div>
                 </div>
 
