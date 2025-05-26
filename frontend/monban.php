@@ -3,10 +3,10 @@
 <?php include('../backend/db_connect.php'); ?>
 
 <?php
-// Lấy danh sách loại thực đơn
+// Danh sách loại thực đơn
 $ds_loai = $conn->query("SELECT ten FROM loaithucdon ORDER BY ten ASC");
 
-// Xử lý thêm/cập nhật
+// Xử lý thêm / cập nhật
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ten = trim($_POST['ten_mon'] ?? '');
     $loai = $_POST['loai'] ?? '';
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Xử lý xóa
+// Xóa món
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $conn->query("DELETE FROM monban WHERE id = $id");
@@ -43,10 +43,30 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Xử lý lọc
+// Tìm kiếm + lọc
 $filter_loai = $_GET['loai'] ?? '';
-$cond = $filter_loai ? "WHERE loaithucdon = '" . $conn->real_escape_string($filter_loai) . "'" : '';
-$ds_mon = $conn->query("SELECT * FROM monban $cond ORDER BY id DESC");
+$search = $_GET['search'] ?? '';
+$conds = [];
+
+if (!empty($filter_loai)) {
+    $conds[] = "loaithucdon = '" . $conn->real_escape_string($filter_loai) . "'";
+}
+if (!empty($search)) {
+    $s = $conn->real_escape_string($search);
+    $conds[] = "ten LIKE '%$s%'";
+}
+$where = $conds ? "WHERE " . implode(" AND ", $conds) : "";
+
+// Phân trang
+$page = max(1, intval($_GET['page'] ?? 1));
+$limit = 10;
+$offset = ($page - 1) * $limit;
+$count_result = $conn->query("SELECT COUNT(*) AS total FROM monban $where");
+$total_rows = $count_result->fetch_assoc()['total'];
+$total_pages = ceil($total_rows / $limit);
+
+// Dữ liệu món
+$ds_mon = $conn->query("SELECT * FROM monban $where ORDER BY id DESC LIMIT $limit OFFSET $offset");
 
 // Dữ liệu khi sửa
 $mon_sua = null;
@@ -94,16 +114,18 @@ if (isset($_GET['edit'])) {
         </div>
 
         <?php if ($mon_sua): ?>
-        <input type="hidden" name="id_update" value="<?= $mon_sua['id'] ?>">
-        <button class="btn btn-warning">Cập nhật</button>
-        <a href="monban.php" class="btn btn-secondary ml-2">Hủy</a>
+            <input type="hidden" name="id_update" value="<?= $mon_sua['id'] ?>">
+            <button class="btn btn-warning">Cập nhật</button>
+            <a href="monban.php" class="btn btn-secondary ml-2">Hủy</a>
         <?php else: ?>
-        <button class="btn btn-success">Thêm món</button>
+            <button class="btn btn-success">Thêm món</button>
         <?php endif; ?>
     </form>
 
-    <!-- Bộ lọc -->
+    <!-- Tìm kiếm + lọc -->
     <form method="GET" class="form-inline mb-3">
+        <input type="text" name="search" class="form-control mr-2" placeholder="Tìm tên món..."
+            value="<?= htmlspecialchars($search) ?>">
         <select name="loai" class="form-control mr-2">
             <option value="">-- Tất cả loại thực đơn --</option>
             <?php $ds_loai->data_seek(0);
@@ -112,7 +134,7 @@ if (isset($_GET['edit'])) {
                 echo "<option value='{$l['ten']}' $selected>{$l['ten']}</option>";
             endwhile; ?>
         </select>
-        <button class="btn btn-outline-primary">Lọc</button>
+        <button class="btn btn-outline-primary"><i class="fas fa-search"></i> Lọc</button>
     </form>
 
     <!-- Danh sách món -->
@@ -132,24 +154,38 @@ if (isset($_GET['edit'])) {
         </thead>
         <tbody>
             <?php while ($m = $ds_mon->fetch_assoc()): ?>
-            <tr>
-                <td><?= $m['id'] ?></td>
-                <td><?= htmlspecialchars($m['ten']) ?></td>
-                <td><?= htmlspecialchars($m['loaithucdon']) ?></td>
-                <td><?= number_format($m['giavon_500']) ?></td>
-                <td><?= number_format($m['giavon_700']) ?></td>
-                <td><?= number_format($m['giaban_500']) ?></td>
-                <td><?= number_format($m['giaban_700']) ?></td>
-                <td><?= nl2br(htmlspecialchars($m['ghichu'])) ?></td>
-                <td>
-                    <a href="?edit=<?= $m['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
-                    <a href="?delete=<?= $m['id'] ?>" class="btn btn-sm btn-danger"
-                        onclick="return confirm('Xác nhận xoá?')">Xoá</a>
-                </td>
-            </tr>
+                <tr>
+                    <td><?= $m['id'] ?></td>
+                    <td><?= htmlspecialchars($m['ten']) ?></td>
+                    <td><?= htmlspecialchars($m['loaithucdon']) ?></td>
+                    <td><?= number_format($m['giavon_500']) ?></td>
+                    <td><?= number_format($m['giavon_700']) ?></td>
+                    <td><?= number_format($m['giaban_500']) ?></td>
+                    <td><?= number_format($m['giaban_700']) ?></td>
+                    <td><?= nl2br(htmlspecialchars($m['ghichu'])) ?></td>
+                    <td>
+                        <a href="congthuc.php?mon_id=<?= $m['id'] ?>" class="btn btn-sm btn-info">Công thức</a>
+                        <a href="?edit=<?= $m['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
+                        <a href="?delete=<?= $m['id'] ?>" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Xác nhận xoá?')">Xoá</a>
+                    </td>
+                </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
+
+    <!-- Phân trang -->
+    <nav>
+        <ul class="pagination">
+            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
+                        <?= $i ?>
+                    </a>
+                </li>
+            <?php endfor; ?>
+        </ul>
+    </nav>
 </div>
 
 <?php include('layout/footer.php'); ?>
