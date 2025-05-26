@@ -11,6 +11,7 @@
             ['link' => 'loaihang.php', 'icon' => 'fas fa-tags', 'label' => 'Loại hàng'],
             ['link' => 'loaithucdon.php', 'icon' => 'fas fa-list-alt', 'label' => 'Loại thực đơn'],
             ['link' => 'nhacungcap.php', 'icon' => 'fas fa-truck', 'label' => 'Nhà cung cấp'],
+            ['link' => 'monban.php', 'icon' => 'fas fa-utensils', 'label' => 'Món bán'],
 
             // ✅ Quản lý hóa đơn ảnh
             ['link' => 'upload_hoadon.php', 'icon' => 'fas fa-upload', 'label' => 'Tải lên hóa đơn'],
