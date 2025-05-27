@@ -125,23 +125,23 @@ $tongtien = $sumRes->fetch_assoc()['tongtien'] ?? 0;
             </thead>
             <tbody>
                 <?php while ($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['mahang']) ?></td>
-                        <td><?= htmlspecialchars($row['tenhang']) ?></td>
-                        <td><?= number_format($row['giavon'], 0, ',', '.') ?>đ</td>
-                        <td><?= htmlspecialchars($row['loaihang']) ?></td>
-                        <td><?= htmlspecialchars($row['nhomhang']) ?></td>
-                        <td><?= $row['soluong'] ?></td>
-                        <td><?= htmlspecialchars($row['donvitinh']) ?></td>
-                        <td><?= $row['tonkho'] ?></td>
-                        <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
-                        <td><?= htmlspecialchars($row['ghichu'] ?? '') ?></td>
-                        <td>
-                            <a href="edit_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
-                            <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Xác nhận xóa?')">Xóa</a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td><?= htmlspecialchars($row['mahang']) ?></td>
+                    <td><?= htmlspecialchars($row['tenhang']) ?></td>
+                    <td><?= number_format($row['giavon'], 0, ',', '.') ?>đ</td>
+                    <td><?= htmlspecialchars($row['loaihang']) ?></td>
+                    <td><?= htmlspecialchars($row['nhomhang']) ?></td>
+                    <td><?= $row['soluong'] ?></td>
+                    <td><?= htmlspecialchars($row['donvitinh']) ?></td>
+                    <td><?= $row['tonkho'] ?></td>
+                    <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
+                    <td><?= htmlspecialchars($row['ghichu'] ?? '') ?></td>
+                    <td>
+                        <a href="edit_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
+                        <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Xác nhận xóa?')">Xóa</a>
+                    </td>
+                </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
@@ -150,9 +150,9 @@ $tongtien = $sumRes->fetch_assoc()['tongtien'] ?? 0;
     <nav>
         <ul class="pagination justify-content-center">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <li class="page-item <?= ($i == $page ? 'active' : '') ?>">
-                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>"><?= $i ?></a>
-                </li>
+            <li class="page-item <?= ($i == $page ? 'active' : '') ?>">
+                <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>"><?= $i ?></a>
+            </li>
             <?php endfor; ?>
         </ul>
     </nav>
