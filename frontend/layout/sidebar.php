@@ -11,13 +11,11 @@
             ['link' => 'index.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Tổng quan'],
             ['link' => 'hanghoa.php', 'icon' => 'fas fa-box', 'label' => 'Hàng hóa'],
             ['link' => 'nhapkho_xuatkho.php', 'icon' => 'fas fa-warehouse', 'label' => 'Nhập / Xuất kho'],
+            ['link' => 'monban.php', 'icon' => 'fas fa-utensils', 'label' => 'Món bán'],
+            ['link' => 'nhacungcap.php', 'icon' => 'fas fa-truck', 'label' => 'Nhà cung cấp'],
             ['link' => 'nhomhang.php', 'icon' => 'fas fa-layer-group', 'label' => 'Nhóm hàng'],
             ['link' => 'loaihang.php', 'icon' => 'fas fa-tags', 'label' => 'Loại hàng'],
             ['link' => 'loaithucdon.php', 'icon' => 'fas fa-list-alt', 'label' => 'Loại thực đơn'],
-            ['link' => 'nhacungcap.php', 'icon' => 'fas fa-truck', 'label' => 'Nhà cung cấp'],
-            ['link' => 'monban.php', 'icon' => 'fas fa-utensils', 'label' => 'Món bán'],
-
-            // ✅ Quản lý hóa đơn ảnh
             ['link' => 'upload_hoadon.php', 'icon' => 'fas fa-upload', 'label' => 'Tải lên hóa đơn'],
             ['link' => 'danhsach_hoadon.php', 'icon' => 'fas fa-image', 'label' => 'Hóa đơn đã lưu'],
 
