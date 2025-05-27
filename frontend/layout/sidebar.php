@@ -9,7 +9,7 @@
         <?php
         $menus = [
             ['link' => 'index.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Tổng quan'],
-            ['link' => 'hanghoa.php', 'icon' => 'fas fa-box', 'label' => 'Hàng hóa'],
+            ['link' => 'hanghoa.php', 'icon' => 'fas fa-box', 'label' => 'Quản lý hàng hóa'],
             ['link' => 'nhapkho_xuatkho.php', 'icon' => 'fas fa-warehouse', 'label' => 'Nhập / Xuất kho'],
             ['link' => 'monban.php', 'icon' => 'fas fa-utensils', 'label' => 'Món bán'],
             ['link' => 'nhacungcap.php', 'icon' => 'fas fa-truck', 'label' => 'Nhà cung cấp'],
