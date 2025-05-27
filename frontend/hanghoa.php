@@ -1,33 +1,33 @@
-<?php include('layout/header.php'); ?>
-<?php include('layout/sidebar.php'); ?>
-<?php include('../backend/db_connect.php'); ?>
 <?php
+include('layout/header.php');
+include('layout/sidebar.php');
+include('../backend/db_connect.php');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Xử lý thêm hàng hóa
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['mahang'])) {
-    $mahang = $_POST['mahang'];
-    $tenhang = $_POST['tenhang'];
-    $giavon = $_POST['giavon'];
-    $loaihang = $_POST['loaihang'];
-    $nhomhang = $_POST['nhomhang'];
-    $soluong = $_POST['soluong'];
-    $donvitinh = $_POST['donvitinh'];
-    $tonkho = $_POST['tonkho'];
-    $nhacungcap = $_POST['nhacungcap'];
-    $ghichu = $_POST['ghichu'];
+    $mahang = $conn->real_escape_string($_POST['mahang']);
+    $tenhang = $conn->real_escape_string($_POST['tenhang']);
+    $giavon = (float)$_POST['giavon'];
+    $loaihang = $conn->real_escape_string($_POST['loaihang']);
+    $nhomhang = $conn->real_escape_string($_POST['nhomhang']);
+    $soluong = (int)$_POST['soluong'];
+    $donvitinh = $conn->real_escape_string($_POST['donvitinh']);
+    $tonkho = (int)$_POST['tonkho'];
+    $nhacungcap = $conn->real_escape_string($_POST['nhacungcap']);
+    $ghichu = $conn->real_escape_string($_POST['ghichu']);
 
     $sql = "INSERT INTO hanghoa 
         (mahang, tenhang, giavon, loaihang, nhomhang, soluong, donvitinh, tonkho, nhacungcap, ghichu)
         VALUES 
-        ('$mahang', '$tenhang', '$giavon', '$loaihang', '$nhomhang', '$soluong', '$donvitinh', '$tonkho', '$nhacungcap', '$ghichu')";
+        ('$mahang', '$tenhang', $giavon, '$loaihang', '$nhomhang', $soluong, '$donvitinh', $tonkho, '$nhacungcap', '$ghichu')";
     $conn->query($sql);
     header("Location: hanghoa.php");
     exit;
 }
 
-// Xử lý lọc
+// Xử lý lọc và phân trang
 $search = $_GET['search'] ?? '';
 $filter_nhom = $_GET['filter_nhom'] ?? '';
 $filter_loai = $_GET['filter_loai'] ?? '';
@@ -50,32 +50,32 @@ if (!empty($filter_loai)) {
 }
 $where = count($cond) ? "WHERE " . implode(" AND ", $cond) : "";
 
-// Tổng số bản ghi
 $countRes = $conn->query("SELECT COUNT(*) as total FROM hanghoa $where");
 $totalRows = $countRes->fetch_assoc()['total'];
 $totalPages = ceil($totalRows / $limit);
 
-// Lấy dữ liệu
 $result = $conn->query("SELECT * FROM hanghoa $where ORDER BY id DESC LIMIT $limit OFFSET $offset");
 
-// Dữ liệu lọc
 $ds_loai = $conn->query("SELECT ten FROM loaihang ORDER BY ten ASC");
 $ds_nhom = $conn->query("SELECT ten FROM nhomhang ORDER BY ten ASC");
 
-// Tính tổng tiền nhập
 $sumRes = $conn->query("SELECT SUM(giavon * soluong) AS tongtien FROM hanghoa $where");
 $tongtien = $sumRes->fetch_assoc()['tongtien'] ?? 0;
 ?>
 
 <div id="page-content-wrapper" class="p-4">
-    <div class="d-flex justify-content-between mb-3 align-items-center">
+    <div class="d-flex justify-content-between mb-3 align-items-center flex-wrap">
         <h2>Danh sách hàng hóa</h2>
-        <button class="btn btn-success" data-toggle="modal" data-target="#themModal">
-            <i class="fas fa-plus"></i> Thêm mới
-        </button>
+        <div>
+            <button class="btn btn-success" data-toggle="modal" data-target="#themModal">
+                <i class="fas fa-plus"></i> Thêm mới
+            </button>
+            <a href="export_excel.php?<?= http_build_query($_GET) ?>" class="btn btn-info ml-2">
+                <i class="fas fa-file-excel"></i> Xuất Excel
+            </a>
+        </div>
     </div>
 
-    <!-- Lọc -->
     <form method="GET" class="form-inline mb-3">
         <input type="text" name="search" class="form-control mr-2" placeholder="Tìm theo mã, tên, NCC..."
             value="<?= htmlspecialchars($search) ?>">
@@ -102,12 +102,10 @@ $tongtien = $sumRes->fetch_assoc()['tongtien'] ?? 0;
         <button class="btn btn-outline-primary"><i class="fas fa-search"></i> Lọc</button>
     </form>
 
-    <!-- Tổng tiền nhập -->
     <div class="text-right mb-2 font-weight-bold">
         Tổng tiền nhập: <span class="text-danger"><?= number_format($tongtien, 0, ',', '.') ?> đ</span>
     </div>
 
-    <!-- Bảng -->
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead class="thead-light">
@@ -127,35 +125,34 @@ $tongtien = $sumRes->fetch_assoc()['tongtien'] ?? 0;
             </thead>
             <tbody>
                 <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
-                    <td><?= htmlspecialchars($row['mahang']) ?></td>
-                    <td><?= htmlspecialchars($row['tenhang']) ?></td>
-                    <td><?= number_format($row['giavon'], 0, ',', '.') ?>đ</td>
-                    <td><?= htmlspecialchars($row['loaihang']) ?></td>
-                    <td><?= htmlspecialchars($row['nhomhang']) ?></td>
-                    <td><?= $row['soluong'] ?></td>
-                    <td><?= htmlspecialchars($row['donvitinh']) ?></td>
-                    <td><?= $row['tonkho'] ?></td>
-                    <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
-                    <td><?= htmlspecialchars($row['ghichu'] ?? '') ?></td>
-                    <td>
-                        <a href="edit_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
-                        <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
-                            onclick="return confirm('Xác nhận xóa?')">Xóa</a>
-                    </td>
-                </tr>
+                    <tr>
+                        <td><?= htmlspecialchars($row['mahang']) ?></td>
+                        <td><?= htmlspecialchars($row['tenhang']) ?></td>
+                        <td><?= number_format($row['giavon'], 0, ',', '.') ?>đ</td>
+                        <td><?= htmlspecialchars($row['loaihang']) ?></td>
+                        <td><?= htmlspecialchars($row['nhomhang']) ?></td>
+                        <td><?= $row['soluong'] ?></td>
+                        <td><?= htmlspecialchars($row['donvitinh']) ?></td>
+                        <td><?= $row['tonkho'] ?></td>
+                        <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
+                        <td><?= htmlspecialchars($row['ghichu'] ?? '') ?></td>
+                        <td>
+                            <a href="edit_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
+                            <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Xác nhận xóa?')">Xóa</a>
+                        </td>
+                    </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
     </div>
 
-    <!-- Phân trang -->
     <nav>
         <ul class="pagination justify-content-center">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-            <li class="page-item <?= ($i == $page ? 'active' : '') ?>">
-                <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>"><?= $i ?></a>
-            </li>
+                <li class="page-item <?= ($i == $page ? 'active' : '') ?>">
+                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>"><?= $i ?></a>
+                </li>
             <?php endfor; ?>
         </ul>
     </nav>
