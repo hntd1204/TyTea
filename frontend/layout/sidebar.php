@@ -7,6 +7,7 @@
         $menus = [
             ['link' => 'index.php', 'icon' => 'fas fa-chart-pie', 'label' => 'Tổng quan'],
             ['link' => 'hanghoa.php', 'icon' => 'fas fa-box', 'label' => 'Hàng hóa'],
+            ['link' => 'nhapkho_xuatkho.php', 'icon' => 'fas fa-warehouse', 'label' => 'Nhập / Xuất kho'],
             ['link' => 'nhomhang.php', 'icon' => 'fas fa-layer-group', 'label' => 'Nhóm hàng'],
             ['link' => 'loaihang.php', 'icon' => 'fas fa-tags', 'label' => 'Loại hàng'],
             ['link' => 'loaithucdon.php', 'icon' => 'fas fa-list-alt', 'label' => 'Loại thực đơn'],
