@@ -1,5 +1,8 @@
 <div class="bg-primary border-right shadow" id="sidebar-wrapper">
-    <div class="sidebar-heading text-white font-weight-bold text-center py-4" style="font-size: 1.2rem;">
+    <div class="text-center py-3">
+        <img src="../img/logo.jpg" alt="TyTea Logo" style="max-width: 120px; height: auto;">
+    </div>
+    <div class="sidebar-heading text-white font-weight-bold text-center py-2" style="font-size: 1.2rem;">
         TyTea - Matcha and Tea
     </div>
     <nav class="list-group list-group-flush">
