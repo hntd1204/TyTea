@@ -1,8 +1,8 @@
-<?php include('layout/header.php'); ?>
-<?php include('layout/sidebar.php'); ?>
-<?php include('../backend/db_connect.php'); ?>
-
 <?php
+include('layout/header.php');
+include('layout/sidebar.php');
+include('../backend/db_connect.php');
+
 $mon_id = $_GET['mon_id'] ?? 0;
 $mon = $conn->query("SELECT * FROM monban WHERE id = $mon_id")->fetch_assoc();
 
@@ -11,45 +11,50 @@ if (!$mon) {
     exit;
 }
 
-// Sửa
+// Sửa nguyên liệu
 $edit_id = $_GET['edit'] ?? null;
 $nguyenlieu_sua = null;
 if ($edit_id) {
+    $edit_id = (int)$edit_id;
     $nguyenlieu_sua = $conn->query("SELECT * FROM congthuc_mon WHERE id = $edit_id")->fetch_assoc();
 }
 
-// Thêm hoặc cập nhật
+// Thêm hoặc cập nhật nguyên liệu
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['thanh_phan'])) {
     $tp = $conn->real_escape_string($_POST['thanh_phan']);
-    $sl = floatval($_POST['so_luong']);
+    $sl_500 = floatval($_POST['so_luong_500'] ?? 0);
+    $sl_700 = floatval($_POST['so_luong_700'] ?? 0);
     $dv = $conn->real_escape_string($_POST['don_vi']);
-    $ghichu = $conn->real_escape_string($_POST['ghi_chu']);
+    $ghichu = $conn->real_escape_string($_POST['ghi_chu'] ?? '');
 
     if (isset($_POST['id_update']) && is_numeric($_POST['id_update'])) {
         $id_up = (int)$_POST['id_update'];
-        $conn->query("UPDATE congthuc_mon SET 
-                        thanh_phan='$tp', 
-                        so_luong=$sl, 
-                        don_vi='$dv', 
-                        ghi_chu='$ghichu' 
-                      WHERE id=$id_up");
+        $sql = "UPDATE congthuc_mon SET 
+                    thanh_phan='$tp', 
+                    so_luong_500=$sl_500, 
+                    so_luong_700=$sl_700, 
+                    don_vi='$dv', 
+                    ghi_chu='$ghichu' 
+                WHERE id=$id_up";
     } else {
-        $conn->query("INSERT INTO congthuc_mon (mon_id, thanh_phan, so_luong, don_vi, ghi_chu)
-                      VALUES ($mon_id, '$tp', $sl, '$dv', '$ghichu')");
+        $sql = "INSERT INTO congthuc_mon (mon_id, thanh_phan, so_luong_500, so_luong_700, don_vi, ghi_chu)
+                VALUES ($mon_id, '$tp', $sl_500, $sl_700, '$dv', '$ghichu')";
     }
+    $conn->query($sql);
 
     header("Location: congthuc.php?mon_id=$mon_id");
     exit;
 }
 
-// Xoá
+// Xoá nguyên liệu
 if (isset($_GET['delete'])) {
-    $id = (int) $_GET['delete'];
+    $id = (int)$_GET['delete'];
     $conn->query("DELETE FROM congthuc_mon WHERE id = $id");
     header("Location: congthuc.php?mon_id=$mon_id");
     exit;
 }
 
+// Lấy danh sách nguyên liệu
 $ct = $conn->query("SELECT * FROM congthuc_mon WHERE mon_id = $mon_id ORDER BY id ASC");
 ?>
 
@@ -64,8 +69,12 @@ $ct = $conn->query("SELECT * FROM congthuc_mon WHERE mon_id = $mon_id ORDER BY i
                     value="<?= htmlspecialchars($nguyenlieu_sua['thanh_phan'] ?? '') ?>">
             </div>
             <div class="col">
-                <input name="so_luong" type="number" step="0.01" class="form-control" placeholder="Số lượng" required
-                    value="<?= htmlspecialchars($nguyenlieu_sua['so_luong'] ?? '') ?>">
+                <input name="so_luong_500" type="number" step="0.01" class="form-control" placeholder="Số lượng 500ml"
+                    value="<?= htmlspecialchars($nguyenlieu_sua['so_luong_500'] ?? '') ?>">
+            </div>
+            <div class="col">
+                <input name="so_luong_700" type="number" step="0.01" class="form-control" placeholder="Số lượng 700ml"
+                    value="<?= htmlspecialchars($nguyenlieu_sua['so_luong_700'] ?? '') ?>">
             </div>
             <div class="col">
                 <input name="don_vi" class="form-control" placeholder="Đơn vị (ml, gam...)"
@@ -88,12 +97,13 @@ $ct = $conn->query("SELECT * FROM congthuc_mon WHERE mon_id = $mon_id ORDER BY i
     </form>
 
     <!-- Bảng công thức -->
-    <table class="table table-bordered">
+    <table class="table table-bordered table-hover">
         <thead class="thead-light">
             <tr>
                 <th>#</th>
                 <th>Nguyên liệu</th>
-                <th>Số lượng</th>
+                <th>Số lượng 500ml</th>
+                <th>Số lượng 700ml</th>
                 <th>Đơn vị</th>
                 <th>Ghi chú</th>
                 <th>Thao tác</th>
@@ -105,7 +115,8 @@ $ct = $conn->query("SELECT * FROM congthuc_mon WHERE mon_id = $mon_id ORDER BY i
                 <tr>
                     <td><?= $i++ ?></td>
                     <td><?= htmlspecialchars($row['thanh_phan']) ?></td>
-                    <td><?= $row['so_luong'] ?></td>
+                    <td><?= htmlspecialchars($row['so_luong_500']) ?></td>
+                    <td><?= htmlspecialchars($row['so_luong_700']) ?></td>
                     <td><?= htmlspecialchars($row['don_vi']) ?></td>
                     <td><?= htmlspecialchars($row['ghi_chu']) ?></td>
                     <td>
