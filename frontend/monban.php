@@ -6,6 +6,9 @@
 // Danh sách loại thực đơn
 $ds_loai = $conn->query("SELECT ten FROM loaithucdon ORDER BY ten ASC");
 
+// Lấy trang hiện tại (mặc định 1)
+$page = $_GET['page'] ?? 1;
+
 // Xử lý thêm / cập nhật
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ten = trim($_POST['ten_mon'] ?? '');
@@ -16,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $giaban_500 = (int)($_POST['giaban_500'] ?? 0);
     $giaban_700 = (int)($_POST['giaban_700'] ?? 0);
     $ghichu = $conn->real_escape_string($_POST['ghichu'] ?? '');
+    $page = $_POST['page'] ?? 1;
 
     if ($ten !== '') {
         if ($id_update) {
@@ -30,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     VALUES ('$ten', '$loai', $giavon_500, $giavon_700, $giaban_500, $giaban_700, '$ghichu')";
         }
         $conn->query($sql);
-        header("Location: monban.php");
+        header("Location: monban.php?page=" . intval($page));
         exit;
     }
 }
@@ -39,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $conn->query("DELETE FROM monban WHERE id = $id");
-    header("Location: monban.php");
+    header("Location: monban.php?page=" . intval($page));
     exit;
 }
 
@@ -81,6 +85,7 @@ if (isset($_GET['edit'])) {
 
     <!-- Form thêm / sửa -->
     <form method="POST" class="mb-4">
+        <input type="hidden" name="page" value="<?= htmlspecialchars($page) ?>">
         <div class="form-row mb-2">
             <div class="col"><input name="ten_mon" class="form-control" placeholder="Tên món" required
                     value="<?= $mon_sua['ten'] ?? '' ?>"></div>
@@ -116,7 +121,7 @@ if (isset($_GET['edit'])) {
         <?php if ($mon_sua): ?>
             <input type="hidden" name="id_update" value="<?= $mon_sua['id'] ?>">
             <button class="btn btn-warning">Cập nhật</button>
-            <a href="monban.php" class="btn btn-secondary ml-2">Hủy</a>
+            <a href="monban.php?page=<?= intval($page) ?>" class="btn btn-secondary ml-2">Hủy</a>
         <?php else: ?>
             <button class="btn btn-success">Thêm món</button>
         <?php endif; ?>
@@ -165,8 +170,8 @@ if (isset($_GET['edit'])) {
                     <td><?= nl2br(htmlspecialchars($m['ghichu'])) ?></td>
                     <td>
                         <a href="congthuc.php?mon_id=<?= $m['id'] ?>" class="btn btn-sm btn-info">Công thức</a>
-                        <a href="?edit=<?= $m['id'] ?>" class="btn btn-sm btn-primary">Sửa</a>
-                        <a href="?delete=<?= $m['id'] ?>" class="btn btn-sm btn-danger"
+                        <a href="?edit=<?= $m['id'] ?>&page=<?= intval($page) ?>" class="btn btn-sm btn-primary">Sửa</a>
+                        <a href="?delete=<?= $m['id'] ?>&page=<?= intval($page) ?>" class="btn btn-sm btn-danger"
                             onclick="return confirm('Xác nhận xoá?')">Xoá</a>
                     </td>
                 </tr>
