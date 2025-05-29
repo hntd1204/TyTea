@@ -50,23 +50,23 @@ if (isset($_GET['edit'])) {
 ?>
 
 <div id="page-content-wrapper" class="p-4">
-    <h2 class="mb-4">Note</h2>
+    <h2 class="mb-4">Ghi Chú Cá Nhân</h2>
 
     <!-- Form thêm ghi chú -->
     <form method="POST" class="mb-4">
         <div class="form-group">
-            <label for="title">Tiêu đề:</label>
+            <label for="title">Tiêu đề ghi chú:</label>
             <input name="title" id="title" class="form-control" type="text" required>
         </div>
         <div class="form-group">
-            <label for="note">Nội dung:</label>
+            <label for="note">Nội dung ghi chú:</label>
             <textarea name="note" id="note" class="form-control" rows="4" required></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Lưu</button>
+        <button type="submit" class="btn btn-primary">Lưu Ghi Chú</button>
     </form>
 
     <!-- Hiển thị danh sách ghi chú -->
-    <h3 class="mt-4">Danh sách Note của bạn</h3>
+    <h3 class="mt-4">Danh sách ghi chú của bạn</h3>
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>
@@ -83,14 +83,21 @@ if (isset($_GET['edit'])) {
                     <td><?= date('d-m-Y H:i', strtotime($note['created_at'])) ?></td>
                     <td>
                         <!-- Nút sửa -->
-                        <a href="note.php?edit=<?= $note['id'] ?>" class="btn btn-sm btn-warning" data-toggle="modal"
-                            data-target="#editModal<?= $note['id'] ?>">Sửa</a>
+                        <a href="note.php?edit=<?= $note['id'] ?>" class="btn btn-sm btn-warning">Sửa</a>
                         <!-- Nút xóa -->
                         <a href="note.php?delete=<?= $note['id'] ?>" class="btn btn-sm btn-danger"
                             onclick="return confirm('Xác nhận xóa?')">Xóa</a>
                         <!-- Nút xem chi tiết -->
-                        <a href="note.php?view=<?= $note['id'] ?>" class="btn btn-sm btn-info" data-toggle="modal"
-                            data-target="#viewModal<?= $note['id'] ?>">Xem chi tiết</a>
+                        <a href="note.php?view=<?= $note['id'] ?>" class="btn btn-sm btn-info"
+                            id="viewDetail<?= $note['id'] ?>">Xem chi tiết</a>
+                    </td>
+                </tr>
+                <tr id="detail<?= $note['id'] ?>" style="display: none;">
+                    <td colspan="3">
+                        <div class="alert alert-info">
+                            <strong>Chi tiết ghi chú:</strong>
+                            <p><?= nl2br(htmlspecialchars($note['content'])) ?></p>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -101,70 +108,6 @@ if (isset($_GET['edit'])) {
 
 <?php include('layout/footer.php'); ?>
 
-<!-- Modal sửa ghi chú -->
-<?php foreach ($notes as $note): ?>
-<div class="modal fade" id="editModal<?= $note['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form method="POST">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Sửa ghi chú</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="title">Tiêu đề:</label>
-                        <input name="title" class="form-control" type="text"
-                            value="<?= htmlspecialchars($note['title']) ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="note">Nội dung:</label>
-                        <textarea name="note" class="form-control" rows="4"
-                            required><?= htmlspecialchars($note['content']) ?></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" name="edit_note" class="btn btn-primary">Cập nhật</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<?php endforeach; ?>
-
-<!-- Modal xem chi tiết ghi chú -->
-<?php if (isset($_GET['view'])): ?>
-<?php
-    $id_view = (int)$_GET['view'];
-    $view_note = $conn->query("SELECT * FROM notes WHERE id = $id_view")->fetch_assoc();
-    ?>
-<div class="modal fade" id="viewModal<?= $view_note['id'] ?>" tabindex="-1" role="dialog"
-    aria-labelledby="viewModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="viewModalLabel">Chi tiết Note</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <h5 class="font-weight-bold"><?= htmlspecialchars($view_note['title']) ?></h5>
-                <p><?= nl2br(htmlspecialchars($view_note['content'])) ?></p>
-                <small class="text-muted"><?= date('d-m-Y H:i', strtotime($view_note['created_at'])) ?></small>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-            </div>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
 <!-- Thư viện JS Bootstrap 4 -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
@@ -172,9 +115,18 @@ if (isset($_GET['edit'])) {
 
 <script>
 $(document).ready(function() {
-    // Đóng modal khi nhấn vào nút Đóng
-    $('[data-dismiss="modal"]').on('click', function() {
-        $('.modal').modal('hide');
+    // Khi nhấn nút "Xem chi tiết", hiển thị nội dung ghi chú
+    $('[id^="viewDetail"]').on('click', function() {
+        var id = $(this).attr('href').split('=')[1]; // Lấy id ghi chú từ URL
+        var detailRow = $('#detail' + id);
+
+        // Kiểm tra xem chi tiết đã được mở chưa, nếu chưa thì mở, nếu đã mở thì đóng
+        if (detailRow.is(':visible')) {
+            detailRow.hide(); // Ẩn chi tiết
+        } else {
+            detailRow.show(); // Hiển thị chi tiết
+        }
+        return false; // Ngăn chặn hành vi mặc định của link
     });
 });
 </script>
