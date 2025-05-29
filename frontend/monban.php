@@ -1,6 +1,9 @@
 <?php include('layout/header.php'); ?>
 <?php include('layout/sidebar.php'); ?>
 <?php include('../backend/db_connect.php'); ?>
+<?php // Include phần hiển thị thông báo riêng
+include('layout/notification.php');  // Đường dẫn chính xác tùy cấu trúc thư mục của bạn
+?>
 
 <?php
 // Danh sách loại thực đơn
