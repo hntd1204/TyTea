@@ -2,6 +2,8 @@
 include('layout/header.php');
 include('layout/sidebar.php');
 include('../backend/db_connect.php');
+// Include phần hiển thị thông báo riêng
+include('layout/notification.php');  // Đường dẫn chính xác tùy cấu trúc thư mục của bạn
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -104,7 +106,7 @@ $history = $conn->query($sql_history);
     <h2>Quản lý Nhập Xuất Kho</h2>
 
     <?php if ($message): ?>
-    <div class="alert alert-info"><?= htmlspecialchars($message) ?></div>
+        <div class="alert alert-info"><?= htmlspecialchars($message) ?></div>
     <?php endif; ?>
 
     <!-- Form lọc -->
@@ -112,10 +114,10 @@ $history = $conn->query($sql_history);
         <select name="mahang" class="form-control mr-2" style="min-width: 200px;">
             <option value="">-- Tất cả hàng hóa --</option>
             <?php while ($row = $hanghoa_res->fetch_assoc()): ?>
-            <option value="<?= htmlspecialchars($row['mahang']) ?>"
-                <?= ($filter_mahang == $row['mahang']) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($row['mahang']) ?> - <?= htmlspecialchars($row['tenhang']) ?>
-            </option>
+                <option value="<?= htmlspecialchars($row['mahang']) ?>"
+                    <?= ($filter_mahang == $row['mahang']) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($row['mahang']) ?> - <?= htmlspecialchars($row['tenhang']) ?>
+                </option>
             <?php endwhile; ?>
         </select>
 
@@ -148,22 +150,22 @@ $history = $conn->query($sql_history);
             <tbody>
                 <?php
                 if ($totalRows == 0): ?>
-                <tr>
-                    <td colspan="8" class="text-center">Không có dữ liệu</td>
-                </tr>
-                <?php else:
+                    <tr>
+                        <td colspan="8" class="text-center">Không có dữ liệu</td>
+                    </tr>
+                    <?php else:
                     $i = $offset + 1;
                     while ($row = $history->fetch_assoc()): ?>
-                <tr>
-                    <td><?= $i++ ?></td>
-                    <td><?= htmlspecialchars($row['mahang']) ?></td>
-                    <td><?= htmlspecialchars($row['tenhang'] ?? '') ?></td>
-                    <td><?= $row['soluong'] ?></td>
-                    <td><?= ucfirst($row['loai']) ?></td>
-                    <td><?= htmlspecialchars($row['nguoi_thuc_hien']) ?></td>
-                    <td><?= htmlspecialchars($row['ghichu']) ?></td>
-                    <td><?= date('d/m/Y H:i', strtotime($row['ngaytao'])) ?></td>
-                </tr>
+                        <tr>
+                            <td><?= $i++ ?></td>
+                            <td><?= htmlspecialchars($row['mahang']) ?></td>
+                            <td><?= htmlspecialchars($row['tenhang'] ?? '') ?></td>
+                            <td><?= $row['soluong'] ?></td>
+                            <td><?= ucfirst($row['loai']) ?></td>
+                            <td><?= htmlspecialchars($row['nguoi_thuc_hien']) ?></td>
+                            <td><?= htmlspecialchars($row['ghichu']) ?></td>
+                            <td><?= date('d/m/Y H:i', strtotime($row['ngaytao'])) ?></td>
+                        </tr>
                 <?php endwhile;
                 endif; ?>
             </tbody>
@@ -172,17 +174,17 @@ $history = $conn->query($sql_history);
 
     <!-- Phân trang -->
     <?php if ($totalPages > 1): ?>
-    <nav>
-        <ul class="pagination justify-content-center">
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
-                    <?= $i ?>
-                </a>
-            </li>
-            <?php endfor; ?>
-        </ul>
-    </nav>
+        <nav>
+            <ul class="pagination justify-content-center">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                        <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
+                            <?= $i ?>
+                        </a>
+                    </li>
+                <?php endfor; ?>
+            </ul>
+        </nav>
     <?php endif; ?>
 
     <!-- Form nhập xuất kho -->
@@ -197,9 +199,9 @@ $history = $conn->query($sql_history);
                     // Lấy lại danh sách cho select (nếu cần)
                     $hanghoa2 = $conn->query("SELECT mahang, tenhang FROM hanghoa ORDER BY tenhang ASC");
                     while ($row = $hanghoa2->fetch_assoc()): ?>
-                    <option value="<?= htmlspecialchars($row['mahang']) ?>">
-                        <?= htmlspecialchars($row['mahang']) ?> - <?= htmlspecialchars($row['tenhang']) ?>
-                    </option>
+                        <option value="<?= htmlspecialchars($row['mahang']) ?>">
+                            <?= htmlspecialchars($row['mahang']) ?> - <?= htmlspecialchars($row['tenhang']) ?>
+                        </option>
                     <?php endwhile; ?>
                 </select>
             </div>
@@ -234,12 +236,12 @@ $history = $conn->query($sql_history);
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    $('#mahang').select2({
-        placeholder: "-- Chọn hàng hóa --",
-        allowClear: true
+    $(document).ready(function() {
+        $('#mahang').select2({
+            placeholder: "-- Chọn hàng hóa --",
+            allowClear: true
+        });
     });
-});
 </script>
 
 <?php include('layout/footer.php'); ?>

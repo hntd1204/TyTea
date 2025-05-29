@@ -1,0 +1,63 @@
+/* Container thông báo */
+.alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    z-index: 1050;
+}
+
+/* Thông báo */
+.custom-alert {
+    position: relative;
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+    border-radius: 4px;
+    padding: 12px 45px 12px 20px;
+    /* Padding phải rộng để chừa chỗ cho nút đóng */
+    margin-bottom: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    animation: slideDownFadeIn 0.3s ease forwards;
+    word-wrap: break-word;
+    /* Cho phép xuống dòng */
+    white-space: normal;
+}
+
+/* Nút đóng */
+.custom-alert .close-btn {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 25px;
+    font-size: 20px;
+    line-height: 20px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #0c5460;
+    outline: none;
+    transition: color 0.3s ease;
+}
+
+.custom-alert .close-btn:hover {
+    color: #004085;
+}
+
+/* Hiệu ứng hiển thị */
+@keyframes slideDownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

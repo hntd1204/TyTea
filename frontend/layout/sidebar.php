@@ -19,6 +19,7 @@
             ['link' => 'upload_hoadon.php', 'icon' => 'fas fa-upload', 'label' => 'Tải lên hóa đơn'],
             ['link' => 'danhsach_hoadon.php', 'icon' => 'fas fa-image', 'label' => 'Hóa đơn đã lưu'],
             ['link' => 'note.php', 'icon' => 'fas fa-sticky-note', 'label' => 'Note'],  // Mục Note mới thêm vào
+            ['link' => 'thongbao.php', 'icon' => 'fas fa-bell', 'label' => 'Thông báo'],  // Mục Thông báo mới thêm vào
             ['link' => 'logout.php', 'icon' => 'fas fa-sign-out-alt', 'label' => 'Đăng xuất'],
         ];
 
