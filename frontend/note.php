@@ -5,6 +5,13 @@ include('../backend/db_connect.php');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Số ghi chú hiển thị mỗi trang
+$limit = 5;
+
+// Lấy trang hiện tại (mặc định 1)
+$page = max(1, (int)($_GET['page'] ?? 1));
+$offset = ($page - 1) * $limit;
+
 // Xử lý thêm ghi chú
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['note'])) {
     $title = $conn->real_escape_string($_POST['title']);  // Tiêu đề ghi chú
@@ -19,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['note'])) {
 
 // Lấy danh sách ghi chú đã lưu (chỉ của bạn)
 $notes = [];
-$result = $conn->query("SELECT * FROM notes ORDER BY created_at DESC");
+$result = $conn->query("SELECT * FROM notes ORDER BY created_at DESC LIMIT $limit OFFSET $offset");
 while ($row = $result->fetch_assoc()) {
     $notes[] = $row;
 }
@@ -47,6 +54,11 @@ if (isset($_GET['edit'])) {
         exit;
     }
 }
+
+// Tính tổng số ghi chú để tính số trang
+$total_result = $conn->query("SELECT COUNT(*) AS total FROM notes");
+$total_rows = $total_result->fetch_assoc()['total'];
+$total_pages = ceil($total_rows / $limit);
 ?>
 
 <div id="page-content-wrapper" class="p-4">
@@ -78,55 +90,35 @@ if (isset($_GET['edit'])) {
             </thead>
             <tbody>
                 <?php foreach ($notes as $note): ?>
-                <tr>
-                    <td><?= htmlspecialchars($note['title']) ?></td>
-                    <td><?= date('d-m-Y H:i', strtotime($note['created_at'])) ?></td>
-                    <td>
-                        <!-- Nút sửa -->
-                        <a href="note.php?edit=<?= $note['id'] ?>" class="btn btn-sm btn-warning">Sửa</a>
-                        <!-- Nút xóa -->
-                        <a href="note.php?delete=<?= $note['id'] ?>" class="btn btn-sm btn-danger"
-                            onclick="return confirm('Xác nhận xóa?')">Xóa</a>
-                        <!-- Nút xem chi tiết -->
-                        <a href="note.php?view=<?= $note['id'] ?>" class="btn btn-sm btn-info"
-                            id="viewDetail<?= $note['id'] ?>">Xem chi tiết</a>
-                    </td>
-                </tr>
-                <tr id="detail<?= $note['id'] ?>" style="display: none;">
-                    <td colspan="3">
-                        <div class="alert alert-info">
-                            <strong>Chi tiết ghi chú:</strong>
-                            <p><?= nl2br(htmlspecialchars($note['content'])) ?></p>
-                        </div>
-                    </td>
-                </tr>
+                    <tr>
+                        <td><?= htmlspecialchars($note['title']) ?></td>
+                        <td><?= date('d-m-Y H:i', strtotime($note['created_at'])) ?></td>
+                        <td>
+                            <!-- Nút sửa -->
+                            <a href="note.php?edit=<?= $note['id'] ?>" class="btn btn-sm btn-warning">Sửa</a>
+                            <!-- Nút xóa -->
+                            <a href="note.php?delete=<?= $note['id'] ?>" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Xác nhận xóa?')">Xóa</a>
+                            <!-- Nút xem chi tiết -->
+                            <a href="note.php?view=<?= $note['id'] ?>" class="btn btn-sm btn-info">Xem chi tiết</a>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+
+    <!-- Phân trang -->
+    <nav>
+        <ul class="pagination">
+            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                </li>
+            <?php endfor; ?>
+        </ul>
+    </nav>
+
 </div>
 
 <?php include('layout/footer.php'); ?>
-
-<!-- Thư viện JS Bootstrap 4 -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-$(document).ready(function() {
-    // Khi nhấn nút "Xem chi tiết", hiển thị nội dung ghi chú
-    $('[id^="viewDetail"]').on('click', function() {
-        var id = $(this).attr('href').split('=')[1]; // Lấy id ghi chú từ URL
-        var detailRow = $('#detail' + id);
-
-        // Kiểm tra xem chi tiết đã được mở chưa, nếu chưa thì mở, nếu đã mở thì đóng
-        if (detailRow.is(':visible')) {
-            detailRow.hide(); // Ẩn chi tiết
-        } else {
-            detailRow.show(); // Hiển thị chi tiết
-        }
-        return false; // Ngăn chặn hành vi mặc định của link
-    });
-});
-</script>
