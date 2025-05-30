@@ -2,8 +2,6 @@
 include('layout/header.php');
 include('layout/sidebar.php');
 include('../backend/db_connect.php');
-// Include phần hiển thị thông báo riêng
-include('layout/notification.php');  // Đường dẫn chính xác tùy cấu trúc thư mục của bạn
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 

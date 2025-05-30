@@ -2,8 +2,6 @@
 include('layout/header.php');
 include('layout/sidebar.php');
 include('../backend/db_connect.php');
-// Include phần hiển thị thông báo riêng
-include('layout/notification.php');  // Đường dẫn chính xác tùy cấu trúc thư mục của bạn
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -120,15 +118,15 @@ if (isset($_GET['edit'])) {
         <select name="filter_nhom" class="form-control mr-2">
             <option value="">-- Nhóm hàng --</option>
             <?php foreach ($ds_nhom_arr as $nh): ?>
-                <option value="<?= htmlspecialchars($nh) ?>" <?= ($filter_nhom == $nh) ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($nh) ?></option>
+            <option value="<?= htmlspecialchars($nh) ?>" <?= ($filter_nhom == $nh) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($nh) ?></option>
             <?php endforeach; ?>
         </select>
         <select name="filter_loai" class="form-control mr-2">
             <option value="">-- Loại hàng --</option>
             <?php foreach ($ds_loai_arr as $lh): ?>
-                <option value="<?= htmlspecialchars($lh) ?>" <?= ($filter_loai == $lh) ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($lh) ?></option>
+            <option value="<?= htmlspecialchars($lh) ?>" <?= ($filter_loai == $lh) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($lh) ?></option>
             <?php endforeach; ?>
         </select>
         <button class="btn btn-outline-primary"><i class="fas fa-search"></i> Lọc</button>
@@ -157,24 +155,24 @@ if (isset($_GET['edit'])) {
             </thead>
             <tbody>
                 <?php while ($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['mahang']) ?></td>
-                        <td><?= htmlspecialchars($row['tenhang']) ?></td>
-                        <td><?= number_format($row['giavon'], 0, ',', '.') ?> đ</td>
-                        <td><?= htmlspecialchars($row['loaihang']) ?></td>
-                        <td><?= htmlspecialchars($row['nhomhang']) ?></td>
-                        <td><?= $row['soluong'] ?></td>
-                        <td><?= htmlspecialchars($row['donvitinh']) ?></td>
-                        <td><?= $row['tonkho'] ?></td>
-                        <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
-                        <td><?= htmlspecialchars($row['ghichu'] ?? '') ?></td>
-                        <td>
-                            <a href="hanghoa.php?edit=<?= $row['id'] ?>&page=<?= $page ?>"
-                                class="btn btn-sm btn-primary">Sửa</a>
-                            <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Xác nhận xóa?')">Xóa</a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td><?= htmlspecialchars($row['mahang']) ?></td>
+                    <td><?= htmlspecialchars($row['tenhang']) ?></td>
+                    <td><?= number_format($row['giavon'], 0, ',', '.') ?> đ</td>
+                    <td><?= htmlspecialchars($row['loaihang']) ?></td>
+                    <td><?= htmlspecialchars($row['nhomhang']) ?></td>
+                    <td><?= $row['soluong'] ?></td>
+                    <td><?= htmlspecialchars($row['donvitinh']) ?></td>
+                    <td><?= $row['tonkho'] ?></td>
+                    <td><?= htmlspecialchars($row['nhacungcap']) ?></td>
+                    <td><?= htmlspecialchars($row['ghichu'] ?? '') ?></td>
+                    <td>
+                        <a href="hanghoa.php?edit=<?= $row['id'] ?>&page=<?= $page ?>"
+                            class="btn btn-sm btn-primary">Sửa</a>
+                        <a href="../backend/delete_hanghoa.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Xác nhận xóa?')">Xóa</a>
+                    </td>
+                </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
@@ -183,11 +181,11 @@ if (isset($_GET['edit'])) {
     <nav>
         <ul class="pagination justify-content-center">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                    <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
-                        <?= $i ?>
-                    </a>
-                </li>
+            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                <a class="page-link" href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>">
+                    <?= $i ?>
+                </a>
+            </li>
             <?php endfor; ?>
         </ul>
     </nav>
@@ -199,7 +197,7 @@ if (isset($_GET['edit'])) {
         <form method="POST" class="modal-content">
             <input type="hidden" name="page" value="<?= htmlspecialchars($page) ?>">
             <?php if ($item_sua): ?>
-                <input type="hidden" name="id_update" value="<?= $item_sua['id'] ?>">
+            <input type="hidden" name="id_update" value="<?= $item_sua['id'] ?>">
             <?php endif; ?>
             <div class="modal-header">
                 <h5 class="modal-title" id="themModalLabel"><?= $item_sua ? "Sửa hàng hóa" : "Thêm hàng hóa" ?></h5>
@@ -221,9 +219,9 @@ if (isset($_GET['edit'])) {
                     <div class="col"><label>Loại hàng</label>
                         <select name="loaihang" class="form-control">
                             <?php foreach ($ds_loai_arr as $l): ?>
-                                <option value="<?= htmlspecialchars($l) ?>"
-                                    <?= (isset($item_sua['loaihang']) && $item_sua['loaihang'] == $l) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($l) ?></option>
+                            <option value="<?= htmlspecialchars($l) ?>"
+                                <?= (isset($item_sua['loaihang']) && $item_sua['loaihang'] == $l) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($l) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -232,9 +230,9 @@ if (isset($_GET['edit'])) {
                     <div class="col"><label>Nhóm hàng</label>
                         <select name="nhomhang" class="form-control">
                             <?php foreach ($ds_nhom_arr as $n): ?>
-                                <option value="<?= htmlspecialchars($n) ?>"
-                                    <?= (isset($item_sua['nhomhang']) && $item_sua['nhomhang'] == $n) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($n) ?></option>
+                            <option value="<?= htmlspecialchars($n) ?>"
+                                <?= (isset($item_sua['nhomhang']) && $item_sua['nhomhang'] == $n) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($n) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -270,9 +268,9 @@ if (isset($_GET['edit'])) {
 
 <!-- Tự động mở modal nếu đang sửa -->
 <?php if ($item_sua): ?>
-    <script>
-        $(document).ready(function() {
-            $('#themModal').modal('show');
-        });
-    </script>
+<script>
+$(document).ready(function() {
+    $('#themModal').modal('show');
+});
+</script>
 <?php endif; ?>
