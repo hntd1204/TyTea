@@ -9,27 +9,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ten'])) {
     $id_update = $_POST['id_update'] ?? null;
 
     if (!empty($ten)) {
-        if ($id_update) {
-            $old = $conn->query("SELECT ten FROM loaithucdon WHERE id = $id_update")->fetch_assoc()['ten'];
-            $conn->query("UPDATE loaithucdon SET ten = '$ten' WHERE id = $id_update");
-            $conn->query("UPDATE hanghoa SET loaithucdon = '$ten' WHERE loaithucdon = '$old'");
-            $conn->query("UPDATE monban SET loaithucdon = '$ten' WHERE loaithucdon = '$old'");
-        } else {
-            $conn->query("INSERT INTO loaithucdon (ten) VALUES ('$ten')");
+        try {
+            // Nếu đang chỉnh sửa, cập nhật loại thực đơn
+            if ($id_update) {
+                $conn->query("UPDATE loaithucdon SET ten = '$ten' WHERE id = $id_update");
+            } else {
+                // Thêm loại thực đơn mới
+                $conn->query("INSERT INTO loaithucdon (ten) VALUES ('$ten')");
+            }
+
+            // Redirect về trang loaithucdon.php sau khi cập nhật hoặc thêm mới
+            header("Location: loaithucdon.php");
+            exit; // Đảm bảo không có mã nào được thực thi sau redirect
+        } catch (Exception $e) {
+            echo 'Lỗi: ' . $e->getMessage();
         }
-        header("Location: loaithucdon.php");
-        exit;
     }
 }
 
 // Xoá
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    $ten = $conn->query("SELECT ten FROM loaithucdon WHERE id = $id")->fetch_assoc()['ten'];
     $conn->query("DELETE FROM loaithucdon WHERE id = $id");
-    // $conn->query("UPDATE hanghoa SET loaithucdon = '' WHERE loaithucdon = '$ten'"); // tuỳ chọn nếu cần
     header("Location: loaithucdon.php");
-    exit;
+    exit; // Đảm bảo không có mã nào được thực thi sau khi xóa
 }
 
 // Lấy loại cần sửa
@@ -39,7 +42,7 @@ if ($edit_id) {
     $edit_data = $conn->query("SELECT * FROM loaithucdon WHERE id = $edit_id")->fetch_assoc();
 }
 
-// Danh sách loại
+// Danh sách loại thực đơn
 $result = $conn->query("SELECT * FROM loaithucdon ORDER BY id DESC");
 ?>
 
@@ -48,8 +51,11 @@ $result = $conn->query("SELECT * FROM loaithucdon ORDER BY id DESC");
 
     <!-- Form thêm / sửa -->
     <form method="POST" class="form-inline mb-3">
-        <input type="text" name="ten" class="form-control mr-2" placeholder="Tên loại thực đơn"
-            value="<?= htmlspecialchars($edit_data['ten'] ?? '') ?>" required>
+        <div class="form-group">
+            <label for="ten" class="mr-2">Tên loại thực đơn:</label>
+            <input type="text" name="ten" class="form-control mr-2" placeholder="Tên loại thực đơn"
+                value="<?= htmlspecialchars($edit_data['ten'] ?? '') ?>" required>
+        </div>
         <?php if ($edit_data): ?>
             <input type="hidden" name="id_update" value="<?= $edit_data['id'] ?>">
             <button class="btn btn-warning"><i class="fas fa-edit"></i> Cập nhật</button>
